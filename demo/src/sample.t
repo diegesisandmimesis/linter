@@ -21,26 +21,14 @@
 
 #include "linter.h"
 
-versionInfo: GameID
-        name = 'linter Library Demo Game'
-        byline = 'Diegesis & Mimesis'
-        desc = 'Demo game for the linter library. '
-        version = '1.0'
-        IFID = '12345'
-	showAbout() {
-		"This is a simple test game that demonstrates the features
-		of the linter library.
-		<.p>
-		Consult the README.txt document distributed with the library
-		source for a quick summary of how to use the library in your
-		own games.
-		<.p>
-		The library source is also extensively commented in a way
-		intended to make it as readable as possible. ";
-	}
-;
+versionInfo: GameID;
+gameMain: GameMainDef initialPlayerChar = me;
 
 startRoom: Room 'Void' "This is a featureless void.";
 +me: Person;
 
-gameMain: GameMainDef initialPlayerChar = me;
+myLinter: Linter
+	lint() {
+		warning('bogus test error foozle');
+	}
+;
