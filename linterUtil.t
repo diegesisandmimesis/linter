@@ -8,41 +8,31 @@
 #include <en_us.h>
 
 modify Linter
-
+	// Returns boolean true if obj's superclass list contains the
+	// class arg0 earlier than it includes arg1.
 	superclassListIsABeforeB(obj, arg0, arg1) {
-		local match0, match1;
+		local i, l;
 
-		// Have we matched arg0 class yet?
-		match0 = nil;
+		// Go through the superclass list, returning whenever we
+		// match either arg.
+		l = obj.getSuperclassList();
+		for(i = 1; i <= l.length; i++) {
+			// If we have an exact match of arg0, success.
+			if(l[i] == arg0)
+				return(true);
 
-		// Have we match the arg1 class?
-		match1 = nil;
+			// If we have a subclass of arg0, recurse.
+			if(l[i].ofKind(arg0))
+				return(superclassListIsABeforeB(l[i], arg0,
+				arg1));
 
-		obj.getSuperclassList().forEach(function(cls) {
-			if((match0 == true) || (match1 == true))
-				return;
+			// If we reach here and it's a subclass of arg1, no
+			// fancy check needed (we know it's not ALSO a subclass
+			// of arg0, or it would've been caught above), fail.
+			if(l[i].ofKind(arg1))
+				return(nil);
+		}
 
-			if(cls == arg0) {
-				match0 = true;
-				return;
-			}
-
-			if(cls.ofKind(arg0)) {
-				if(!superclassListIsABeforeB(cls, arg0, arg1))
-					match1 = true;
-				else
-					match0 = true;
-				return;
-			}
-			if(cls == arg1) {
-				match1 = true;
-				return;
-			}
-			if(cls.ofKind(arg1))
-				if(!superclassListIsABeforeB(cls, arg0, arg1))
-					match1 = true;
-		});
-
-		return(match0);
+		return(nil);
 	}
 ;
