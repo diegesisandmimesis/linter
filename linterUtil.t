@@ -73,8 +73,8 @@ modify Linter
 	// or property, that method/property will be tested on each instance.
 	// If fn is a function, it will be called with each instance as its
 	// argument.
-	// The return value is the number of instances for which the test
-	// above did not return true.
+	// The return value is boolean true if the check returns true for
+	// each instance.
 	testInstanceProp(cls, fn) {
 		local i;
 
