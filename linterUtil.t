@@ -42,56 +42,52 @@ modify Linter
 
 	// Returns the number of instances of cls.
 	getInstanceCount(cls) {
-		local i;
-
-		i = 0;
-		forEachInstance(cls, function(o) {
-			i += 1;
-		});
-
-		return(i);
+		return(mapAllInstances(cls, {x: true}).length);
 	}
 
 	// Returns boolean true iff the argument is a singleton.
 	isSingleton(cls) { return(getInstanceCount(cls) == 1); }
 
-	// Returns boolean true if there are instances of the argument
-	// with no location.
-	checkForOrphans(cls) {
-		local i;
-
-		i = 0;
-		forEachInstance(cls, function(o) {
-			if(o.location == nil)
-				i += 1;
-		});
-
-		return(i > 0);
+	// Returns a list containing any orphaned instances of class cls.
+	getOrphans(cls) {
+		return(mapAllInstances(cls, {x: x.location == nil}));
 	}
 
-	// Iterates all instances of the first arg.  If fn is a method
-	// or property, that method/property will be tested on each instance.
-	// If fn is a function, it will be called with each instance as its
-	// argument.
-	// The return value is boolean true if the check returns true for
-	// each instance.
-	testInstanceProp(cls, fn) {
-		local i;
+	// Returns boolean true if there are instances of the argument
+	// with no location.
+	hasOrphans(cls) {
+		return(getOrphans(cls).length > 0);
+	}
 
-		i = 0;
+	// Returns boolean true if fn returns val for all instances of
+	// class cls.
+	testInstanceProp(cls, fn, val = true) {
+		return(mapAllInstances(cls, fn, val).length
+			== getInstanceCount(cls));
+	}
+
+	// Returns a list of all the instances of class cls for which
+	// the function fn returns the value val.
+	// If fn is a method or property, that method/property will be
+	// tested on each instance.  If fn is a function, it will be called
+	// with each instance as its argument.
+	mapAllInstances(cls, fn, val = true) {
+		local v;
+
+		v = new Vector();
 		forEachInstance(cls, function(o) {
 			switch(dataTypeXlat(fn)) {
 				case TypeProp:
-					if(o.(fn)() != true)
-						i += 1;
+					if(o.(fn)() == val)
+						v.append(o);
 					break;
 				case TypeFuncPtr:
-					if(fn(cls) != true)
-						i += 1;
+					if(fn(o) == val)
+						v.append(o);
 					break;
 			}
 		});
 
-		return(i == 0);
+		return(v);
 	}
 ;
