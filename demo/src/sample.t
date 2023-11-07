@@ -31,5 +31,6 @@ myLinter: Linter
 	lint() {
 		warning('this is an example warning');
 		error('this is an example error');
+		info('this is an example info message');
 	}
 ;

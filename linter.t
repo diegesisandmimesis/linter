@@ -53,13 +53,14 @@ class Linter: PreinitObject
 	// Delimeter added at the top and bottom of the linter output
 	logWrapper = '===================='
 
-	// Prefixes used before error and warning messages.
 	errorPrefix = 'ERROR: '
 	warningPrefix = 'warning: '
+	infoPrefix = 'info: '
 
 	// Object classes to use for errors and warnings.
 	errorClass = LinterError
 	warningClass = LinterWarning
+	infoClass = LinterInfo
 
 	// Treat warnings as errors
 	werror = nil
@@ -67,6 +68,7 @@ class Linter: PreinitObject
 	// Vectors for our errors and warnings
 	_errors = perInstance(new Vector)
 	_warnings = perInstance(new Vector)
+	_info = perInstance(new Vector)
 
 	// Called at preinit.
 	execute() {
@@ -91,6 +93,7 @@ class Linter: PreinitObject
 		// Meat of the report
 		reportErrors();
 		reportWarnings();
+		reportInfo();
 
 		// End report output
 		reportFooter();
@@ -134,6 +137,13 @@ class Linter: PreinitObject
 		_warnings.forEach(function(o) { o.report(self); });
 	}
 
+	reportInfo() {
+		if(_info.length == 0)
+			return;
+
+		_info.forEach(function(o) { o.report(self); });
+	}
+
 	// Simple output method.
 	log(msg) {
 		aioSay('\n<<(logPrefix ? logPrefix : '')>><<toString(msg)>>\n ');
@@ -143,10 +153,12 @@ class Linter: PreinitObject
 	// messages.
 	logError(msg) { log('<<errorPrefix>><<msg>>'); }
 	logWarning(msg) { log('<<warningPrefix>><<msg>>'); }
+	logInfo(msg) { log('<<infoPrefix>><<msg>>'); }
 
 	// Append error/warning to the appropriate list.
 	error(msg) { _errors.append(errorClass.createInstance(msg)); }
 	warning(msg) { _warnings.append(warningClass.createInstance(msg)); }
+	info(msg) { _info.append(infoClass.createInstance(msg)); }
 ;
 
 // If we're NOT compiled with the -d flag, the linter does nothing

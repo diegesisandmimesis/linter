@@ -36,3 +36,7 @@ class LinterError: LinterObject
 class LinterWarning: LinterObject
 	report(linter) { linter.logWarning(message); }
 ;
+
+class LinterInfo: LinterObject
+	report(linter) { linter.logInfo(message); }
+;
