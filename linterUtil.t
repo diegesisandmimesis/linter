@@ -59,6 +59,8 @@ modify Linter
 		return(getOrphans(cls).length > 0);
 	}
 
+	checkForOrphans(cls) { return(hasOrphans(cls)); }
+
 	// Returns boolean true if fn returns val for all instances of
 	// class cls.
 	testInstanceProp(cls, fn, val = true) {
