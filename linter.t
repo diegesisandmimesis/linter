@@ -32,6 +32,57 @@
 //	If the -d flag is not used when compiling the module will do nothing.
 //
 //
+// LINTCLASS AND LINTRULE
+//
+//	In addition to adding procedural code to a linter's lint() method,
+//	you can add checks by adding instances of LintClass and LintRule
+//	to the linter.  Example:
+//
+//		myLinter: Linter;
+//		+LintClass @Foo
+//			lintAction(obj) {
+//				if(obj.foo == 'bar')
+//					warning('foo is bar');
+//			}
+//		;
+//
+//	This will iterate through all instances of the Foo class, calling
+//	lintAction() for each instance.
+//
+//	LintClass provides error(), warning(), and info().
+//
+//	LintClass also provides a setFlag() method, which takes a single
+//	text literal as its argument.  Flags can then be checked via
+//	LintRule.  Example:
+//
+//		myLinter: Linter;
+//		+LintClass @Foo
+//			lintAction(obj) {
+//				if(obj.foo == 'bar') {
+//					warning('foo is bar');
+//					setFlag('fooIsBar');
+//				}
+//			}
+//		;
+//		+LintClass @Bar
+//			lintAction(obj) {
+//				if(obj.bar == 'foo') {
+//					warning('bar is foo');
+//					setFlag('barIsFoo');
+//				}
+//			}
+//		;
+//		+LintRule [ 'fooIsBar', 'barIsFoo' ]
+//			lintAction() {
+//				error('foo and bar potentially reversed');
+//			}
+//		;
+//
+//	This checks all instances of Foo to see if foo = 'bar', and all
+//	instances of Bar to see if bar = 'foo'.  In each case a warning is
+//	added and a flag is set.  The LintRule will match when both flags
+//	are set, and will report an error.
+//
 #include <adv3.h>
 #include <en_us.h>
 
@@ -70,14 +121,26 @@ class Linter: PreinitObject
 	_warnings = perInstance(new Vector)
 	_info = perInstance(new Vector)
 
+	_flags = perInstance(new LookupTable)
+
 	// Called at preinit.
 	execute() {
 		lint();
+		lintRules();
 		report();
 	}
 
 	// By default, do nothing.
 	lint() {}
+
+	lintRules() {
+		forEachInstance(LintClass, function(o) {
+			o.executeLintRule(self);
+		});
+		forEachInstance(LintRule, function(o) {
+			o.executeLintRule(self);
+		});
+	}
 
 	// Main output method.
 	report() {
@@ -159,6 +222,27 @@ class Linter: PreinitObject
 	error(msg) { _errors.append(errorClass.createInstance(msg)); }
 	warning(msg) { _warnings.append(warningClass.createInstance(msg)); }
 	info(msg) { _info.append(infoClass.createInstance(msg)); }
+
+	setFlag(id) {
+		_flags[id] = true;
+	}
+
+	checkFlags(lst) {
+		local i;
+
+		if(lst == nil)
+			return(nil);
+		if(!lst.ofKind(Collection))
+			lst = [ lst ];
+
+		i = 0;
+		lst.forEach(function(id) {
+			if(_flags[id] == true)
+				i += 1;
+		});
+
+		return(i == lst.length);
+	}
 ;
 
 // If we're NOT compiled with the -d flag, the linter does nothing
