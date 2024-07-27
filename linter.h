@@ -6,6 +6,6 @@
 //#define __DEBUG_LINTER
 
 LintClass template @lintClass?;
-LintRule template [lintFlags]?;
+LintFlags template [lintFlags]?;
 
 #define LINTER_H

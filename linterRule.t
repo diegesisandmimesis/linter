@@ -49,7 +49,7 @@ class LintRule: _LintRule
 	lintAction() {}
 ;
 
-class LintFlag: _LintRule
+class LintFlags: _LintRule
 	lintFlags = nil
 	executeLintRule(lntr) {
 		if(lntr && !linter) linter = lntr;

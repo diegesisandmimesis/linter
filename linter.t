@@ -72,7 +72,7 @@
 //				}
 //			}
 //		;
-//		+LintFlag [ 'fooIsBar', 'barIsFoo' ]
+//		+LintFlags [ 'fooIsBar', 'barIsFoo' ]
 //			lintAction() {
 //				error('foo and bar potentially reversed');
 //			}
@@ -176,7 +176,7 @@ class Linter: object
 	lintRules() {
 		_lintRules(LintClass);
 		_lintRules(LintRule);
-		_lintRules(LintFlag);
+		_lintRules(LintFlags);
 	}
 
 	// Main output method.
