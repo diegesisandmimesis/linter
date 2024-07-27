@@ -32,11 +32,10 @@
 //	If the -d flag is not used when compiling the module will do nothing.
 //
 //
-// LINTCLASS AND LINTRULE
+// LINTCLASS
 //
-//	In addition to adding procedural code to a linter's lint() method,
-//	you can add checks by adding instances of LintClass and LintRule
-//	to the linter.  Example:
+//	Instances of LintClass can be added to a linter to iterate over
+//	all instances of a given class.  Example:
 //
 //		myLinter: Linter;
 //		+LintClass @Foo
@@ -49,39 +48,105 @@
 //	This will iterate through all instances of the Foo class, calling
 //	lintAction() for each instance.
 //
-//	LintClass provides error(), warning(), and info().
+//	Methods provided by LintClass include:
 //
-//	LintClass also provides a setFlag() method, which takes a single
-//	text literal as its argument.  Flags can then be checked via
-//	LintRule.  Example:
+//		error(msg)		report the message msg as an error
+//
+//		warning(msg)		report the message msg as a warning
+//
+//		info(msg)		report the message msg as an
+//					informational message
+//
+//		setFlag(id)		set a flag for the given id
+//
+//		addCounter(id, v?)	increment a counter with the given id.
+//					the optional second argument is the
+//					amount to increment the counter by,
+//					defaulting to 1 if none is given
+//
+//		getCounter(id)		returns the value of the given counter
+//
+//		lintAction(obj)		method called on all instances of
+//					the target class.  obj is the instance
+//
+//
+// LINTFLAGS
+//
+//	LintFlags checks to see if one or more linter flags have been set
+//	and calls its lintAction() method if they have.
+//
+//	Important properties/methods:
+//
+//		lintFlags		property containing the flags
+//					to check.  must be either a single-
+//					quoted text ID or a List/Vector of
+//					them
+//
+//		lintAction()		method called if all the lintFlags
+//					are set.  note that
+//					LintFlags.lintAction() takes no
+//					argument, unlike
+//					LintClass.lintAction()
+//
+//
+//	Example of use:
 //
 //		myLinter: Linter;
+//		// Iterates over all instances of the class Foo.
 //		+LintClass @Foo
 //			lintAction(obj) {
+//				// Check this instance's foo property.
 //				if(obj.foo == 'bar') {
+//					// Log a warning.
 //					warning('foo is bar');
+//
+//					// Set a flag.
 //					setFlag('fooIsBar');
 //				}
 //			}
 //		;
+//		// Iterates over all instances of the class Bar.
 //		+LintClass @Bar
 //			lintAction(obj) {
+//				// Check this instance's bar property.
 //				if(obj.bar == 'foo') {
+//					// Log a warning.
 //					warning('bar is foo');
+//
+//					// Set a flag.
 //					setFlag('barIsFoo');
 //				}
 //			}
 //		;
+//		// LintFlags rule that fires if the flags 'fooIsBar' and
+//		// 'barIsFoo' are both set;  does nothing otherwise.
 //		+LintFlags [ 'fooIsBar', 'barIsFoo' ]
+//			// Called if both flags are set.
 //			lintAction() {
+//				// Log an error.
 //				error('foo and bar potentially reversed');
 //			}
 //		;
 //
 //	This checks all instances of Foo to see if foo = 'bar', and all
 //	instances of Bar to see if bar = 'foo'.  In each case a warning is
-//	added and a flag is set.  The LintRule will match when both flags
+//	added and a flag is set.  The LintFlags will match when both flags
 //	are set, and will report an error.
+//
+//
+// LINTRULE
+//
+//	LintRule provides a mechanism by which arbitrary checks can
+//	be run.
+//
+//		lintAction()		method which will be called
+//					each time the linter is run.
+//					takes no argument
+//
+//	Placing code in LintRule.lintAction() is functionally identical
+//	to placing it in Linter.lint().  This is just intended to make
+//	it easier to write re-usable linter checks.
+//
 //
 #include <adv3.h>
 #include <en_us.h>
