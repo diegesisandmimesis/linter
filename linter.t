@@ -72,7 +72,7 @@
 //				}
 //			}
 //		;
-//		+LintRule [ 'fooIsBar', 'barIsFoo' ]
+//		+LintFlag [ 'fooIsBar', 'barIsFoo' ]
 //			lintAction() {
 //				error('foo and bar potentially reversed');
 //			}
@@ -94,9 +94,19 @@ linterModuleID: ModuleID {
         listingOrder = 99
 }
 
-class Linter: PreinitObject
-	// Name displayed at the top of report
-	logName = 'linter'
+linterPreinit: PreinitObject
+	execute() {
+		forEachInstance(_LintRule, { x: x.initLintRule() });
+		forEachInstance(Linter, { x: x.execute() });
+	}
+;
+
+class Linter: object
+	active = true
+
+	// Header text displayed at the top of report
+	logHeader = 'linter'
+	logName = (logHeader)
 
 	// Added to the start of every line of output
 	logPrefix = nil
@@ -116,38 +126,65 @@ class Linter: PreinitObject
 	// Treat warnings as errors
 	werror = nil
 
+	defaultRules = static []
+
 	// Vectors for our errors and warnings
 	_errors = perInstance(new Vector)
 	_warnings = perInstance(new Vector)
 	_info = perInstance(new Vector)
 
 	_flags = perInstance(new LookupTable)
+	_counters = perInstance(new LookupTable)
+
+	_lintRulesList = nil
 
 	// Called at preinit.
 	execute() {
+		if(!active) return;
+		addDefaultRules();
 		lint();
 		lintRules();
 		report();
 	}
 
+	addLintRule(obj) {
+		if(obj == nil) return(nil);
+		if(!obj.ofKind(LintClass) && !obj.ofKind(_LintRule))
+			return(nil);
+		if(_lintRulesList == nil) _lintRulesList = new Vector();
+		if(_lintRulesList.indexOf(obj) != nil) return(nil);
+		_lintRulesList.append(obj);
+		obj.linter = self;
+		return(true);
+	}
+
+	addDefaultRules() {
+		if(defaultRules.length == 0)
+			return;
+		defaultRules.forEach({ x: addLintRule(x) });
+	}
+
 	// By default, do nothing.
 	lint() {}
 
+	_lintRules(cls) {
+		if(_lintRulesList == nil) return;
+		_lintRulesList.subset({ x: x.ofKind(cls) })
+			.forEach(function(o) { o.executeLintRule(self); });
+	}
+
 	lintRules() {
-		forEachInstance(LintClass, function(o) {
-			o.executeLintRule(self);
-		});
-		forEachInstance(LintRule, function(o) {
-			o.executeLintRule(self);
-		});
+		_lintRules(LintClass);
+		_lintRules(LintRule);
+		_lintRules(LintFlag);
 	}
 
 	// Main output method.
 	report() {
-		// If we don't have any errors, we bail unless we have
-		// have warnings and were compiled with -D WERROR
-		if((_errors.length == 0)
-			&& (!werror || (_warnings.length == 0)))
+		// If we have no errors, no warnings, and no informational
+		// messages, bail.
+		if((_errors.length == 0) && (_warnings.length == 0)
+			&& (_info.length == 0))
 			return;
 
 		// Start report output
@@ -161,6 +198,9 @@ class Linter: PreinitObject
 		// End report output
 		reportFooter();
 
+		if((_errors.length == 0)
+			&& (!werror || (_warnings.length == 0)))
+			return;
 		// Throw an exception to halt the game.
 		throw new LinterException();
 	}
@@ -169,7 +209,7 @@ class Linter: PreinitObject
 	reportHeader() {
 		log(logWrapper);
 
-		log('<<logName>>');
+		log('<<logHeader>>');
 		log('\terrors:  <<toString(_errors.length)>>');
 		log('\twarnings:  <<toString(_warnings.length)>>');
 	}
@@ -222,6 +262,14 @@ class Linter: PreinitObject
 	error(msg) { _errors.append(errorClass.createInstance(msg)); }
 	warning(msg) { _warnings.append(warningClass.createInstance(msg)); }
 	info(msg) { _info.append(infoClass.createInstance(msg)); }
+
+	addCounter(id, v?) {
+		if(_counters[id] == nil)
+			_counters[id] = 0;
+		_counters[id] += ((v != nil) ? v : 1);
+	}
+
+	getCounter(id) { return(_counters[id]); }
 
 	setFlag(id) {
 		_flags[id] = true;
