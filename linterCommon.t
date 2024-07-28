@@ -39,14 +39,68 @@ modify Thing
 
 		return(true);
 	}
+	lintPluralMismatch() {
+		local i, j, r;
+
+		if((noun == nil) || (isPlural == true))
+			return(nil);
+		r = nil;
+		forEachInstance(Thing, function(o) {
+			if(r == true) return;
+			if(o.plural == nil) return;
+			for(i = 1; i <= noun.length; i++) {
+				for(j = 1; j <= o.plural.length; j++) {
+					if(noun[i] == o.plural[j]) {
+						r = o;
+						return;
+					}
+				}
+			}
+		});
+
+		return(r);
+	}
 ;
 
 weakTokensLinter: LintClass @Thing
 	lintAction(obj) {
 		if(!obj.lintWeakTokens())
 			warning('<q><<obj.name>></q> has weakTokens that
-				conflict with its noun list');
-		
+				conflict with its noun list',
+				'If an object declaration has weak tokens
+				(words in the vocabulary in parentheses)
+				this will prevent the parser from matching
+				that word as a noun.
+				<.p>The linter rule complains when it notices
+				that an object has a weak token that matches
+				a noun on the same object, because that
+				usually means one or the other shouldn\'t
+				be part of the object\'s vocabulary. ');
+	}
+;
+
+pluralMismatchLinter: LintClass @Thing
+	lintAction(obj) {
+		local o;
+
+		if((o = obj.lintPluralMismatch()) != nil)
+			warning('<q><<obj.name>></q> has a non-plural
+				noun that matches another object\'s
+				(<<o.name>>) vocabulary',
+				'If a non-plural object has a noun that\'s
+				the same as a plural in another object\'s
+				vocabulary this will generally cause the
+				parser to always prefer the second object
+				over the first.
+				<.p>The linter complains about this because
+				this generally indicates a mistake
+				somewhere in one of the objects\' declarations,
+				either in failing to make the first object
+				plural (by setting isPlural = true on the
+				object) or in incorrectly declaring the
+				word in question.  For example, declaring
+				a deck of cards \'deck/cards\' instead of
+				\'deck*cards\'.');
 	}
 ;
 

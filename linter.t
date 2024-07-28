@@ -50,11 +50,11 @@
 //
 //	Methods provided by LintClass include:
 //
-//		error(msg)		report the message msg as an error
+//		error(msg, help?)	report the message msg as an error
 //
-//		warning(msg)		report the message msg as a warning
+//		warning(msg, help?)	report the message msg as a warning
 //
-//		info(msg)		report the message msg as an
+//		info(msg, help?)	report the message msg as an
 //					informational message
 //
 //		setFlag(id)		set a flag for the given id
@@ -179,9 +179,9 @@ class Linter: object
 	// Delimeter added at the top and bottom of the linter output
 	logWrapper = '===================='
 
-	errorPrefix = 'ERROR: '
-	warningPrefix = 'warning: '
-	infoPrefix = 'info: '
+	errorPrefix = 'ERROR'
+	warningPrefix = 'warning'
+	infoPrefix = 'info'
 
 	// Object classes to use for errors and warnings.
 	errorClass = LinterError
@@ -292,24 +292,18 @@ class Linter: object
 	// doing some kind of analysis and reporting on it in the report()
 	// method.
 	reportErrors() {
-		if(_errors.length == 0)
-			return;
-
-		_errors.forEach(function(o) { o.report(self); });
+		if(_errors.length == 0) return;
+		_errors.forEach({ x:  log(x.report(errorPrefix)) });
 	}
 
 	reportWarnings() {
-		if(_warnings.length == 0)
-			return;
-
-		_warnings.forEach(function(o) { o.report(self); });
+		if(_warnings.length == 0) return;
+		_warnings.forEach({ x: log(x.report(warningPrefix)) });
 	}
 
 	reportInfo() {
-		if(_info.length == 0)
-			return;
-
-		_info.forEach(function(o) { o.report(self); });
+		if(_info.length == 0) return;
+		_info.forEach({ x:  log(x.report(infoPrefix)) });
 	}
 
 	// Simple output method.
@@ -317,16 +311,19 @@ class Linter: object
 		aioSay('\n<<(logPrefix ? logPrefix : '')>><<toString(msg)>>\n ');
 	}
 
-	// Convenience methods for outputting single-line error and warning
-	// messages.
-	logError(msg) { log('<<errorPrefix>><<msg>>'); }
-	logWarning(msg) { log('<<warningPrefix>><<msg>>'); }
-	logInfo(msg) { log('<<infoPrefix>><<msg>>'); }
-
 	// Append error/warning to the appropriate list.
-	error(msg) { _errors.append(errorClass.createInstance(msg)); }
-	warning(msg) { _warnings.append(warningClass.createInstance(msg)); }
-	info(msg) { _info.append(infoClass.createInstance(msg)); }
+	error(msg, h?) {
+		_errors.append(errorClass.createInstance(msg, h,
+			_errors.length + 1));
+	}
+	warning(msg, h?) {
+		_warnings.append(warningClass.createInstance(msg, h,
+			_warnings.length + 1));
+	}
+	info(msg, h?) {
+		_info.append(infoClass.createInstance(msg, h,
+			_info.length + 1));
+	}
 
 	addCounter(id, v?) {
 		if(_counters[id] == nil)

@@ -22,21 +22,21 @@
 
 class LinterObject: object
 	message = nil
+	helpMsg = nil
+	idx = nil
 
-	construct(msg) { message = msg; }
-	report(linter) { linter.log(message); }
+	construct(msg, h?, v?) { message = msg; helpMsg = h; idx = v; }
+	report(prefix) {
+		return('<<prefix>> <<(idx ? toString(idx) : '')>>:
+			<<message>>');
+	}
+	help() { return(helpMsg); }
 ;
 
 // Class for errors.  Created by Linter.error()
-class LinterError: LinterObject
-	report(linter) { linter.logError(message); }
-;
+class LinterError: LinterObject;
 
 // Class for warnings.  Created by Linter.warning()
-class LinterWarning: LinterObject
-	report(linter) { linter.logWarning(message); }
-;
+class LinterWarning: LinterObject;
 
-class LinterInfo: LinterObject
-	report(linter) { linter.logInfo(message); }
-;
+class LinterInfo: LinterObject;

@@ -7,3 +7,4 @@ source: linterRule.t
 source: linterCommon.t
 source: linterDefaults.t
 source: linterWerror.t
+source: linterAction.t

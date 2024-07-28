@@ -8,9 +8,9 @@
 class _LintRule: object
 	linter = nil
 
-	error(msg) { if(linter) linter.error(msg); }
-	warning(msg) { if(linter) linter.warning(msg); }
-	info(msg) { if(linter) linter.info(msg); }
+	error(msg, h?) { if(linter) linter.error(msg, h); }
+	warning(msg, h?) { if(linter) linter.warning(msg, h); }
+	info(msg, h?) { if(linter) linter.info(msg, h); }
 
 	setFlag(id) { if(linter) linter.setFlag(id); }
 	addCounter(id) { if(linter) linter.addCounter(id); }

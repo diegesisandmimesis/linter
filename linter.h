@@ -8,4 +8,7 @@
 LintClass template @lintClass?;
 LintFlags template [lintFlags]?;
 
+#define DefineLintAction(name) \
+	DefineAction(name, LintAction)
+
 #define LINTER_H

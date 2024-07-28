@@ -31,6 +31,9 @@ startRoom: Room 'Void' "This is a featureless void.";
 +deck: Thing '(of) (cards) deck/cards' 'deck of cards'
 	"It's a deck of cards. "
 ;
++card: Unthing 'card*cards' 'cards'
+	notHereMsg = '{You/He} can\'t do anything with individual cards. '
+;
 
 myLinter: Linter
 	logHeader = 'This is just a test of the stock <q>common</q> linter

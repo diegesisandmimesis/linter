@@ -9,5 +9,8 @@
 #include "linter.h"
 
 modify Linter
-	defaultRules = static [ weakTokensLinter ]
+	defaultRules = static [
+		weakTokensLinter,
+		pluralMismatchLinter
+	]
 ;
