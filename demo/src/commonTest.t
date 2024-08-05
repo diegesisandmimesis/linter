@@ -22,7 +22,16 @@
 #include "linter.h"
 
 versionInfo: GameID;
-gameMain: GameMainDef initialPlayerChar = me;
+gameMain: GameMainDef
+	initialPlayerChar = me
+/*
+	newGame() {
+		forEachInstance(NameAsOther, function(o) {
+			aioSay('\n<<toString(o)>>\n ');
+		});
+	}
+*/
+;
 
 startRoom: Room 'Void' "This is a featureless void.";
 +me: Person;
@@ -34,6 +43,10 @@ startRoom: Room 'Void' "This is a featureless void.";
 +card: Unthing 'card*cards' 'cards'
 	notHereMsg = '{You/He} can\'t do anything with individual cards. '
 ;
+// A NameAsOther delcaration with two mistakes:  superclass list in wrong
+// order and "targetObject" instead of "targetObj".
+pebble: Thing, NameAsOther targetObject = rock;
+rock: Thing '(ordinary) rock' 'rock' "An ordinary rock. ";
 
 myLinter: Linter
 	logHeader = 'This is just a test of the stock <q>common</q> linter

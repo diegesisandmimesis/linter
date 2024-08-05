@@ -104,4 +104,30 @@ pluralMismatchLinter: LintClass @Thing
 	}
 ;
 
+class _nameAsOtherFake: object targetObject = nil;
+
+nameAsOtherLinter: LintClass @NameAsOther
+	lintAction(obj) {
+		if(linter.superclassListIsABeforeB(obj, Thing, NameAsOther))
+			warning('NameAsOther after Thing in superclass list
+				for object <<toString(obj)>>',
+				'NameAsOther was found after Thing in an
+				object\'s superclass list.  This is almost
+				always indicative of a problem, and the
+				order should be reversed.
+				<.p>The name of the offending object is
+				<q><<obj.name>></q>, but that may or may
+				not be helpful because an object declared
+				with NameAsOther shouldn\'t have a name
+				in the first place.');
+		if((obj.targetObj == nil) && (obj.targetObject != nil))
+			warning('<q>targetObject</q> found in NameAsOther
+				instance <<toString(obj)>>',
+				'NameAsOther instance need a <b>targetObj</b>
+				property.  In this case that property was
+				nil, but <b>targetObject</b> was non-nil,
+				possibly indicating a typo.');
+	}
+;
+
 #endif // __DEBUG

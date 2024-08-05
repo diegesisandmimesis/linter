@@ -33,6 +33,7 @@ class LintClass: _LintRule
 		if((lintClass == nil) || (linter == nil))
 			return;
 
+		t3RunGC();
 		forEachInstance(lintClass, function(o) { lintAction(o); });
 	}
 

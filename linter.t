@@ -159,7 +159,8 @@ linterModuleID: ModuleID {
         listingOrder = 99
 }
 
-linterPreinit: PreinitObject
+//linterPreinit: PreinitObject
+linterPreinit: InitObject
 	execute() {
 		forEachInstance(_LintRule, { x: x.initLintRule() });
 		forEachInstance(Linter, { x: x.execute() });

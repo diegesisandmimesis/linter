@@ -13,7 +13,8 @@
 modify Linter
 	defaultRules = static [
 		weakTokensLinter,
-		pluralMismatchLinter
+		pluralMismatchLinter,
+		nameAsOtherLinter
 	]
 ;
 
