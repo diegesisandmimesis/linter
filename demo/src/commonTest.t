@@ -43,10 +43,25 @@ startRoom: Room 'Void' "This is a featureless void.";
 +card: Unthing 'card*cards' 'cards'
 	notHereMsg = '{You/He} can\'t do anything with individual cards. '
 ;
++stone1: Thing '(unremarkable) stone' 'stone' "An unremarkable stone. "
+	isEquivalent = true
+;
++stone2: Thing '(unremarkable) stone' 'stone' "An unremarkable stone. "
+	isEquivalent = true
+;
++widget1: Thing '(very) (unremarkable) widget' 'widget'
+	"An unremarkable widget. "
+	isEquivalent = true
+;
++widget2: Thing '(unremarkable) widget' 'widget'
+	"An unremarkable widget. "
+	isEquivalent = true
+;
 // A NameAsOther delcaration with two mistakes:  superclass list in wrong
 // order and "targetObject" instead of "targetObj".
 pebble: Thing, NameAsOther targetObject = rock;
 rock: Thing '(ordinary) rock' 'rock' "An ordinary rock. ";
+
 
 myLinter: Linter
 	logHeader = 'This is just a test of the stock <q>common</q> linter

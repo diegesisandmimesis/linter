@@ -14,7 +14,8 @@ modify Linter
 	defaultRules = static [
 		weakTokensLinter,
 		pluralMismatchLinter,
-		nameAsOtherLinter
+		nameAsOtherLinter,
+		isEquivalentLinter
 	]
 ;
 
